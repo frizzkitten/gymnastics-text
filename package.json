@@ -1,0 +1,11 @@
+{
+  "name": "gymnastics-text",
+  "version": "1.0.0",
+  "description": "easily sign up for gymnastics!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
