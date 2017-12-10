@@ -19,7 +19,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Drive API.
-  authorize(JSON.parse(content), listFiles);
+  authorize(JSON.parse(content), gymnasticsInfoPeople);
 });
 
 /**
@@ -97,30 +97,88 @@ function storeToken(token) {
 }
 
 /**
- * Lists the names and IDs of up to 10 files.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ * Print the names and pickup locations of students in hackathon spreadsheet:
+ * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ/edit#gid=0
  */
-function listFiles(auth) {
-  var service = google.drive('v3');
-  service.files.list({
-    auth: auth,
-    pageSize: 10,
-    fields: "nextPageToken, files(id, name)"
-  }, function(err, response) {
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    }
-    var files = response.files;
-    if (files.length == 0) {
-      console.log('No files found.');
-    } else {
-      console.log('Files:');
-      for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        console.log('%s (%s)', file.name, file.id);
-      }
-    }
-  });
+function gymnasticsInfoLogistics(auth) {
+	let sheets = google.sheets('v4');
+	sheets.spreadsheets.values.get({
+		auth: auth,
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		range: 'C28:D37'
+	}, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+			return;
+		}
+		let rows = response.values;
+		if (rows != undefined) {
+			let rowNum = 0;
+			while (rowNum < rows.length)
+			{
+				console.log('%s: %s, %s', rows[rowNum][0], rows[rowNum][1], rows[rowNum+1][1]);
+				rowNum += 2;
+			}
+		}
+	});
+	return true;
+}
+
+function gymnasticsInfoPeople(auth) {
+	let sheets = google.sheets('v4');
+	sheets.spreadsheets.values.get({
+		auth: auth,
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		range: 'H9:R40'
+	}, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+			return;
+		}
+		let rows = response.values;
+		if (rows != undefined) {
+			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
+				let row = rows[rowNum];
+				if (row[0] != '' && row[0] != undefined && row[0] != 'McDonalds' && row[0] != 'New Member (not on list)')
+					console.log('%s', row[0]);
+				if (row[2] != '' && row[2] != undefined && row[2] != 'Hub' && row[2] != 'New Member (not on list)')
+					console.log('%s', row[2]);
+				if (row[6] != '' && row[6] != undefined && row[6] != 'Porter' && row[6] != 'New Member (not on list)')
+					console.log('%s', row[6]);
+				if (row[10] != '' && row[10] != undefined && row[10] != "I'll Be There and can drive if needed"
+						&& row[10] != "I'll Be there - No ride needed" && row[10] != 'New Member (not on list)')
+					console.log('%s', row[10]);
+			}
+		}
+	});
+}
+
+function gymnasticsSignUp(auth) {
+	let sheets = google.sheets('v4');
+	authorize(function(authClient) {
+		var request = {
+			// The ID of the spreadsheet to update.
+			spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+
+			// The A1 notation of the values to update.
+			range: 'J21:J21',  // TODO: Update placeholder value.
+
+			resource: {
+				// TODO: Add desired properties to the request body. All existing properties
+				// will be replaced.
+			},
+
+			auth: authClient,
+		};
+
+		sheets.spreadsheets.values.update(request, function(err, response) {
+			if (err) {
+				console.error(err);
+				return;
+			}
+
+			// TODO: Change code below to process the `response` object:
+			console.log(JSON.stringify(response, null, 2));
+		});
+	});
 }
