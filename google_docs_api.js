@@ -1,14 +1,15 @@
+
 var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 
 // If modifying these scopes, delete your previously saved credentials
-// at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
-var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+// at ~/.credentials/drive-nodejs-quickstart.json
+var SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
+var TOKEN_PATH = TOKEN_DIR + 'drive-nodejs-quickstart.json';
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -17,21 +18,8 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
     return;
   }
   // Authorize a client with the loaded credentials, then call the
-  // Google Sheets API.
-  
-  //TODO: make this come from database
-  let pickup = 'Hub';
-  let driver = true;
-  let name = 'Raizel Lieberman';
-  
-  //TODO: make logistics run before people everytime
-  /*
-  if (authorize(JSON.parse(content), gymnasticsInfoLogistics))
-  {
-	  authorize(JSON.parse(content), gymnasticsInfoPeople);
-  }
-  */
-  authorize(JSON.parse(content), gymnasticsSignUp);
+  // Drive API.
+  authorize(JSON.parse(content), gymnasticsInfoPeople);
 });
 
 /**
