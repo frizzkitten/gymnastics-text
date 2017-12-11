@@ -64,12 +64,13 @@ const twilioClient = require('twilio')(accountSid, authToken);
 
 
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
+              " Definitely nudes...old man nudes" +
               "sign up (if you also enter a location after 'sign up' you " +
               "will be signed up for that location instead of your default)\n\n" +
               "info (where tonight’s practice is, what time, and who's going)\n\n" +
               "cancel (to remove your name from the signup sheet)\n\n" +
               "settings (to view and/or change your settings)\n\n" +
-              "help me (in case to see this list again)";
+              "help me (in case you forget the commands you can use in the future)";
 
 app.use(bodyParser.urlencoded());
 app.post('/sms', function(request, response) {
@@ -84,19 +85,20 @@ app.post('/sms', function(request, response) {
         outMessage = msg;
       }
 
-      if (user.changingSettings) {
+      else if (user.changingSettings) {
           if (user.settingToChange) {
               let updated = { settingToChange: undefined, changingSettings: undefined }
               if (user.settingToChange == "name") {
                   updated.name = inMessage;
-                  outMessage = "Changed name to " + inMessage;
-              } else if (user.settingToChange == "pickupLocation") {
+                  outMessage = "Your name has been changed name to " + inMessage;
+              } else if (user.settingToChange == "default pickup location") {
                   let location = parseMessage(inMessage, "getLocation");
+                  console.log(location);
                   if (!location) {
                       outMessage = "Sorry, that isn't a location I recognize. Not changing settings.";
                   } else {
                       updated.pickupLocation = location;
-                      outMessage = "Default pickup location is now " + location + ".";
+                      outMessage = "Your default pickup location is now " + location + ".";
                   }
               }
 
@@ -119,7 +121,8 @@ app.post('/sms', function(request, response) {
               }
               // user correctly entered setting to change, tell DB we will change that setting
               else {
-                  outMessage = "What would you like to change your " + settingToChange + " to?";
+                  //const locations = ""
+                  outMessage = "What would you like to change your " + settingToChange + " too?";
                   const update = { settingToChange: settingToChange };
                   Users.findOneAndUpdate(query, update, options, function (err, user) {
                       if (err) { console.log(err); }
@@ -174,6 +177,10 @@ app.post('/sms', function(request, response) {
           case "settings":
             //TODO settings function
             outMessage = "Would you like to change your name or default pickup location?";
+            const update = { changingSettings: true };
+            Users.findOneAndUpdate(query, update, options, function (err, user) {
+                if (err) { console.log(err); }
+            });
             break;
           default:
             outMessage = HELP_MESSAGE;
@@ -201,7 +208,7 @@ function createUser(number, name, location) {
 
 
 function parseMessage(message, type) {
-  let WORD_CLOSENESS = .4;
+  let WORD_CLOSENESS = .6;
   let MAX_MATCHES = 1;
 
   choices = [];
@@ -237,9 +244,9 @@ function parseMessage(message, type) {
     }
   }
 
-  if (type = "getLocation") {
+  if (type == "getLocation") {
       return undefined;
-  } else if (type = "settingToChange") {
+  } else if (type == "settingToChange") {
       return undefined;
   } else {
       return "help";
@@ -257,7 +264,7 @@ function checkIfNewbie(inText, number, callback) {
 
       // if user has never texted the service before
       if (user === null) {
-        outMessage = "Welcome to NastyText! Texting this number will sign you up for practice. What is your first and last name?";
+        outMessage = "Welcome to NastyText! Texting this number will sign you up for practice. What is your first and last name as shown on the signup spreadsheet?";
         // make database with the phone number as the key
         Users.create({
             number:number

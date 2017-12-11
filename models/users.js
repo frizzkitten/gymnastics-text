@@ -6,7 +6,9 @@ var usersSchema = mongoose.Schema({
   number: String,
   pickupLocation: String,
   exceptionalPickupLocation: String,
-  exceptionalPickupDate: Date
+  exceptionalPickupDate: Date,
+  settingToChange: String,
+  changingSettings: Boolean
 });
 
 // 'Users' means we will use the 'users' collection. if 'Books' was in there
