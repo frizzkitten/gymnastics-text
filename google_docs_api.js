@@ -11,6 +11,9 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
 
+var raizelname = 'Raizel Lieberman'
+var pickupLocation = 'Hub'
+
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   if (err) {
@@ -19,7 +22,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Drive API.
-  authorize(JSON.parse(content), gymnasticsInfoPeople);
+  authorize(JSON.parse(content), gymnasticsSignUp);
 });
 
 /**
@@ -113,12 +116,20 @@ function gymnasticsInfoLogistics(auth) {
 		}
 		let rows = response.values;
 		if (rows != undefined) {
-			let rowNum = 0;
+      //print info for just today
+      let date = new Date();
+      let day = date.getDay();
+      console.log('%s, %s', rows[day][1], rows[day+1][1])
+
+      //print info for every day of the week
+      /*
+      let rowNum = 0;
 			while (rowNum < rows.length)
 			{
 				console.log('%s: %s, %s', rows[rowNum][0], rows[rowNum][1], rows[rowNum+1][1]);
 				rowNum += 2;
 			}
+      */
 		}
 	});
 	return true;
@@ -155,30 +166,18 @@ function gymnasticsInfoPeople(auth) {
 
 function gymnasticsSignUp(auth) {
 	let sheets = google.sheets('v4');
-	authorize(function(authClient) {
-		var request = {
-			// The ID of the spreadsheet to update.
-			spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-
-			// The A1 notation of the values to update.
-			range: 'J21:J21',  // TODO: Update placeholder value.
-
-			resource: {
-				// TODO: Add desired properties to the request body. All existing properties
-				// will be replaced.
-			},
-
-			auth: authClient,
-		};
-
-		sheets.spreadsheets.values.update(request, function(err, response) {
-			if (err) {
-				console.error(err);
-				return;
-			}
-
-			// TODO: Change code below to process the `response` object:
-			console.log(JSON.stringify(response, null, 2));
-		});
-	});
+  sheets.spreadsheets.values.update({
+    spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+    range: 'J21:J21', // TODO: Update placeholder value.
+    valueInputOption: 'RAW',
+    resource: {
+      values: raizelname
+    },
+    auth: auth
+  }, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+			return;
+		}
+  });
 }
