@@ -11,8 +11,8 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
 
-var raizelname = 'Raizel Lieberman'
-var pickupLocation = 'Hub'
+var raizelname = 'Raizel Lieberman';
+var pickupLocation = 'Hub';
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -22,7 +22,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Drive API.
-  authorize(JSON.parse(content), gymnasticsSignUp);
+  authorize(JSON.parse(content), gymnasticsCancel);
 });
 
 /**
@@ -100,8 +100,7 @@ function storeToken(token) {
 }
 
 /**
- * Print the names and pickup locations of students in hackathon spreadsheet:
- * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ/edit#gid=0
+ * Print the location and time of practice for today
  */
 function gymnasticsInfoLogistics(auth) {
 	let sheets = google.sheets('v4');
@@ -135,6 +134,10 @@ function gymnasticsInfoLogistics(auth) {
 	return true;
 }
 
+/**
+ * Print the names and pickup locations of students in hackathon spreadsheet:
+ * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ/edit#gid=0
+ */
 function gymnasticsInfoPeople(auth) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
@@ -160,10 +163,16 @@ function gymnasticsInfoPeople(auth) {
 						&& row[10] != "I'll Be there - No ride needed" && row[10] != 'New Member (not on list)')
 					console.log('%s', row[10]);
 			}
-		}
+    }
 	});
 }
 
+/*
+ * Sign up on the sheet, right now only can do one slot and one name
+ * TODO: come up with algorithm to find where a name should be inserted,
+ * TODO: connect with database to get information about people
+ * TODO: deal with if people sign up for the same spot at the same time
+ */
 function gymnasticsSignUp(auth) {
 	let sheets = google.sheets('v4');
   sheets.spreadsheets.values.update({
@@ -171,7 +180,7 @@ function gymnasticsSignUp(auth) {
     range: 'J21:J21', // TODO: Update placeholder value.
     valueInputOption: 'RAW',
     resource: {
-      values: raizelname
+      values: [[raizelname]]
     },
     auth: auth
   }, function(err, response) {
@@ -179,5 +188,60 @@ function gymnasticsSignUp(auth) {
 			console.log('The API returned an error: ' + err);
 			return;
 		}
+  });
+}
+
+function gymnasticsCancel(auth) {
+	let sheets = google.sheets('v4');
+  sheets.spreadsheets.values.get({
+		auth: auth,
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		range: 'H9:R40'
+	}, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+			return;
+		}
+    let rows = response.values;
+    let a1notation = '';
+    let realRowNum = 9;
+		if (rows != undefined) {
+			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
+        let row = rows[rowNum];
+        if (row[0] == raizelname) {
+          a1notation = 'H' + realRowNum + ':' + 'H' + realRowNum;
+          break;
+        }
+        else if (row[2] == raizelname) {
+          a1notation = 'J' + realRowNum + ':' + 'J' + realRowNum;
+          break;
+        }
+        else if (row[6] == raizelname) {
+          a1notation = 'N' + realRowNum + ':' + 'N' + realRowNum;
+          break;
+        }
+        else if (row[10] == raizelname) {
+          a1notation = 'R' + realRowNum + ':' + 'R' + realRowNum;
+          break;
+        }
+        else {
+          realRowNum++;
+        }
+      }
+      sheets.spreadsheets.values.update({
+        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        range: a1notation, // TODO: Update placeholder value.
+        valueInputOption: 'RAW',
+        resource: {
+          values: [['']]
+        },
+        auth: auth
+      }, function(err, response) {
+      	if (err) {
+      		console.log('The API returned an error: ' + err);
+      		return;
+      	}
+      });
+    }
   });
 }
