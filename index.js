@@ -20,51 +20,7 @@ const accountSid = credentials.twilioSID;
 const authToken = credentials.twilioAuthToken;
 const twilioClient = require('twilio')(accountSid, authToken);
 
-// twilioClient.messages
-//   .create({
-//     to: '+19522502550',
-//     from: '+16088889012',
-//     body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
-//   })
-//   .then((message) => console.log(message.sid));
-
-// const testUser = {
-//     name: "testUser",
-//     number: "9522502550",
-//     pickupLocation: "Hub"
-// }
-// Users.create(testUser, function (err, user) {
-//     if (err) {
-//         console.log(err);
-//         return;
-//     }
-//     console.log("created user: ", user);
-// })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
-              " Definitely nudes...old man nudes" +
               "sign up (if you also enter a location after 'sign up' you " +
               "will be signed up for that location instead of your default)\n\n" +
               "info (where tonight’s practice is, what time, and who's going)\n\n" +
@@ -122,7 +78,10 @@ app.post('/sms', function(request, response) {
               // user correctly entered setting to change, tell DB we will change that setting
               else {
                   //const locations = ""
-                  outMessage = "What would you like to change your " + settingToChange + " too?";
+                  outMessage = "What would you like to change your " + settingToChange + " to?";
+                  if (settingToChange == "default pickup location") {
+                      outMessage = outMessage + " (Hub, McDonald's, or Porter Boathouse)"
+                  }
                   const update = { settingToChange: settingToChange };
                   Users.findOneAndUpdate(query, update, options, function (err, user) {
                       if (err) { console.log(err); }
@@ -213,6 +172,8 @@ function parseMessage(message, type) {
 
   choices = [];
 
+  console.log("message is ", message);
+
   let words = message.split(" ");
   if (type == "getLocation") {
       choices = [
@@ -238,7 +199,7 @@ function parseMessage(message, type) {
   for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
     for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
       //if any word in the message is close to one of the wanted words
-      if (difflib.getCloseMatches(message, choices[choiceIndex].words, MAX_MATCHES, WORD_CLOSENESS).length > 0) {
+      if (difflib.getCloseMatches(words[wordIndex], choices[choiceIndex].words, MAX_MATCHES, WORD_CLOSENESS).length > 0) {
         return choices[choiceIndex].choice;
       }
     }
@@ -309,36 +270,6 @@ function checkIfNewbie(inText, number, callback) {
       callback(newbie, outMessage, user);
   })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 http.createServer(app).listen(1337, () => {
   console.log('Express server listening on port 1337');
