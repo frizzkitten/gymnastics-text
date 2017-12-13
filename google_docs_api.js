@@ -230,7 +230,7 @@ function gymnasticsCancel(auth) {
       }
       sheets.spreadsheets.values.update({
         spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-        range: a1notation, // TODO: Update placeholder value.
+        range: a1notation,
         valueInputOption: 'RAW',
         resource: {
           values: [['']]
