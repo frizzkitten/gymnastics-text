@@ -22,7 +22,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Drive API.
-  authorize(JSON.parse(content), gymnasticsCancel);
+  authorize(JSON.parse(content), gymnasticsCheckStatus);
 });
 
 /**
@@ -243,5 +243,45 @@ function gymnasticsCancel(auth) {
       	}
       });
     }
+  });
+}
+
+function gymnasticsCheckStatus(auth) {
+  let sheets = google.sheets('v4');
+  sheets.spreadsheets.values.get({
+		auth: auth,
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		range: 'H9:R40'
+	}, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+			return;
+		}
+    let rows = response.values;
+    let status = false;
+		if (rows != undefined) {
+			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
+        let row = rows[rowNum];
+        if (row[0] == raizelname) {
+          status = true;
+          break;
+        }
+        else if (row[2] == raizelname) {
+          status = true;
+          break;
+        }
+        else if (row[6] == raizelname) {
+          status = true;
+          break;
+        }
+        else if (row[10] == raizelname) {
+          status = true;
+          break;
+        }
+        else {
+        }
+      }
+    }
+    console.log(status);
   });
 }
