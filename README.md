@@ -20,33 +20,45 @@ Two options here.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Clone this repository.
+Create a file called credentials.js which looks like this:
 
 ```
-Give examples
+module.exports = {
+    dbUsername: "YOUR MLAB USERNAME",
+    dbPassword: "YOUR MLAB PASSWORD",
+    twilioSID: "YOUR TWILIO SID",
+    twilioAuthToken: "YOUR TWILIO AUTH TOKEN"
+}
+
 ```
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+Install all dependencies from package.json:
 
 ```
-Give the example
+npm install
 ```
 
-And repeat
+Install and run ngrok
 
 ```
-until finished
+npm install -g ngrok
+ngrok http 1337
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Once ngrok is running you will see two lines that start with "Forwarding".
+Take the https://#########.ngrok.io from the second one and append /sms
+Go to your Twilio account, find the number you will be using, click on it. Scroll down until you see "Messaging."
+In the box next to "A message comes in" paste your version of https://#########.ngrok.io/sms
+Ensure that to the left it says Webhook and to the right it says HTTP POST.
+
+Run npm start and you're done!
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Haven't deployed yet, still have to run on our own machines.
 
 ## Authors
 
@@ -58,6 +70,4 @@ See also the list of [contributors](https://github.com/frizzkitten/gymnastics-te
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* Thank you to the forward-thinking leadership of the Wisconsin Gymnastics Club for allowing us to try this out
