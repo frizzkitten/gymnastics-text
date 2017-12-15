@@ -49,9 +49,13 @@ ngrok http 1337
 ```
 
 Once ngrok is running you will see two lines that start with "Forwarding".
+
 Take the https://#########.ngrok.io from the second one and append /sms
+
 Go to your Twilio account, find the number you will be using, click on it. Scroll down until you see "Messaging."
+
 In the box next to "A message comes in" paste your version of https://#########.ngrok.io/sms
+
 Ensure that to the left it says Webhook and to the right it says HTTP POST.
 
 Run npm start and you're done!
