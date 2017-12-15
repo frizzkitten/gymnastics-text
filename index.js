@@ -51,25 +51,24 @@ app.post('/sms', function(request, response) {
       else {
         // parse to figure out which command the person wants to perform
         let choice = parseMessage(inMessage, false);
-        console.log("user wants: " + choice);
 
         switch (choice) {
           case "signUp":
             //TODO sign up function
 
+            outMessage = "You are [not actually] signed up for practice. Pickup is at " +
+                "[TIME] from " + user.pickupLocation;
+
             break;
           case "info":
-            // TODO query database for user's pickup location info
-
             // TODO query google sheet for practice info
 
             outMessage = "Practice tonight is at [LOCATION] from [TIME] " +
-                "until [TIME]. Pickup is at [TIME] from [PICKUP LOCATION].\n\n" +
-                "People who have signed up so far: [LIST OF PEOPLE]"
+                "until [TIME]. Pickup is at [TIME] from " + user.pickupLocation +
+                ".\n\nPeople who have signed up so far: [LIST OF PEOPLE]"
             break;
           case "cancel":
             // TODO check if they're actually signed up
-            // get user from database
 
 
             // TODO if not actually signed up, tell them they are no longer signed up
@@ -127,8 +126,6 @@ function parseMessage(message, type) {
 
   choices = [];
 
-  console.log("message is ", message);
-
   let words = message.split(" ");
   if (type == "getLocation") {
       choices = [
@@ -176,8 +173,6 @@ function checkIfNewbie(inText, number, callback) {
   const query = {number: number};
 
   Users.findOne(query, function(err, user) {
-      console.log(user);
-
       // if user has never texted the service before
       if (user === null) {
         outMessage = "Welcome to NastyText! Texting this number will sign you up for practice. What is your first and last name as shown on the signup spreadsheet?";
@@ -236,7 +231,6 @@ function changeSettings(user, inMessage, query, options) {
             outMessage = "Your name has been changed name to " + inMessage;
         } else if (user.settingToChange == "default pickup location") {
             let location = parseMessage(inMessage, "getLocation");
-            console.log(location);
             if (!location) {
                 outMessage = "Sorry, that isn't a location I recognize. Not changing settings.";
             } else {
