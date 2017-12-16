@@ -1,6 +1,6 @@
 # gymnastics-text
 
-An easy way for UW gymnasts to sign up for practice via text! The club usually signs up using [this spreadsheet](https://docs.google.com/spreadsheets/u/2/d/1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920/edit?usp=sharing), but sign up is much easier if you can just text in to say you're going that day. Works by interacting with the spreadsheet, which can also be used to sign up, so the two will always be in sync.
+An easy way for UW gymnasts to sign up for the carpools for practice via text! The club usually signs up using [this spreadsheet](https://docs.google.com/spreadsheets/u/2/d/1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920/edit?usp=sharing), but sign up is much easier if you can just text in to say you're going that day. Works by interacting with the spreadsheet, which can also be used to sign up, so the two will always be in sync.
 
 ## Getting Started
 
