@@ -138,7 +138,7 @@ function parseMessage(message, type) {
       choices =[
         {"choice": "signUp", "words": ['sign', 'register', 'signup']},
         {"choice": "info", "words": ['info', 'tonight', 'where', 'when', 'time']},
-        {"choice": "people", "words": ['whos', 'going', 'who', 'people']}
+        {"choice": "people", "words": ['whos', 'going', 'who', 'people']},
         {"choice": "cancel", "words": ['cancel']},
         {"choice": "settings", "words": ['settings', 'preferences']}
     ];
