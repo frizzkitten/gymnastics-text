@@ -17,9 +17,10 @@ var canDrive = false;
 var justRideBack = false;
 var noRide = true;
 var when = 'there';
+var driver = false;
 
 // Load client secrets from a local file.
-function editSheet(user, sign, cancel, driver, action) {
+function editSheet(user, sign, cancel, action) {
     fs.readFile('client_secret.json', function processClientSecrets(err, content) {
       if (err) {
         console.log('Error loading client secret file: ' + err);
@@ -27,7 +28,7 @@ function editSheet(user, sign, cancel, driver, action) {
       }
       // Authorize a client with the loaded credentials, then call the
       // Drive API.
-      return authorize(JSON.parse(content), user.name, true, false, true, action);
+      return authorize(JSON.parse(content), user.name, sign, cancel, action);
     });
 }
 
@@ -39,7 +40,7 @@ function editSheet(user, sign, cancel, driver, action) {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, name, sign, cancel, driver, callback) {
+function authorize(credentials, name, sign, cancel, callback) {
   var clientSecret = credentials.installed.client_secret;
   var clientId = credentials.installed.client_id;
   var redirectUrl = credentials.installed.redirect_uris[0];
@@ -52,7 +53,7 @@ function authorize(credentials, name, sign, cancel, driver, callback) {
       getNewToken(oauth2Client, callback);
     } else {
       oauth2Client.credentials = JSON.parse(token);
-      callback(oauth2Client, name, sign, cancel, driver);
+      callback(oauth2Client, name, sign, cancel);
     }
   });
 }
@@ -170,11 +171,10 @@ function gymnasticsInfoPeople(auth) {
 
 /*
  * Sign up on the sheet, right now only can do one slot and one name
- * TODO: come up with algorithm to find where a name should be inserted,
  * TODO: connect with database to get information about people
  * TODO: deal with if people sign up for the same spot at the same time
  */
-function gymnasticsSignUp(auth, name, driver) {
+function gymnasticsSignUp(auth, name) {
 	let sheets = google.sheets('v4');
   let a1notation;
   sheets.spreadsheets.values.get({
@@ -204,7 +204,7 @@ function gymnasticsSignUp(auth, name, driver) {
           }
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-            range: a1notationA, // TODO: Update placeholder value.
+            range: a1notationA, 
             valueInputOption: 'RAW',
             resource: {
               values: [[name]]
@@ -218,7 +218,7 @@ function gymnasticsSignUp(auth, name, driver) {
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-            range: a1notationB, // TODO: Update placeholder value.
+            range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
               values: [[pickupLocation]]
@@ -243,7 +243,7 @@ function gymnasticsSignUp(auth, name, driver) {
           }
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-            range: a1notationA, // TODO: Update placeholder value.
+            range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
               values: [[name]]
@@ -257,7 +257,7 @@ function gymnasticsSignUp(auth, name, driver) {
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-            range: a1notationB, // TODO: Update placeholder value.
+            range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
               values: [[when]]
@@ -326,7 +326,7 @@ function gymnasticsSignUp(auth, name, driver) {
       }
       sheets.spreadsheets.values.update({
         spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-        range: a1notation, // TODO: Update placeholder value.
+        range: a1notation,
         valueInputOption: 'RAW',
         resource: {
           values: [[name]]
@@ -341,7 +341,6 @@ function gymnasticsSignUp(auth, name, driver) {
       });
     }
   });
-  //call gymnasticsCheckStatus() to make sure signup worked?
 }
 
 function gymnasticsCancel(auth, name) {
@@ -398,7 +397,6 @@ function gymnasticsCancel(auth, name) {
       });
     }
   });
-  //call gymnasticsCheckStatus() to make sure cancel worked?
 }
 
 function gymnasticsCheckStatus(auth, name, sign, cancel, driver) {
@@ -468,22 +466,20 @@ function test() {
 }
 
 function signUp(user) {
-    return editSheet(user, true, false, false, gymnasticsCheckStatus);
+    return editSheet(user, true, false, gymnasticsCheckStatus);
 }
 function cancel(user) {
-    return editSheet(user, gymnasticsCheckStatus(auth, user.name, false, true, false));
+    return editSheet(user, false, true, gymnasticsCheckStatus);
 }
 function checkStatus(user) {
-    return editSheet(user, gymnasticsCheckStatus(auth, user.name, false, false, false));
+    return editSheet(user, false, false, gymnasticsCheckStatus);
 }
 function infoPeople() {
-    return editSheet(null, false, false, false, gymnasticsInfoPeople);
+    return editSheet(null, false, false, gymnasticsInfoPeople);
 }
 function infoLogistics() {
-    return editSheet(null, false, false, false, gymnasticsInfoLogistics);
+    return editSheet(null, false, false, gymnasticsInfoLogistics);
 }
-
-
 
 module.exports = {
     signUp: signUp,
