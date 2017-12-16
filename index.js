@@ -25,8 +25,9 @@ const twilioClient = require('twilio')(accountSid, authToken);
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
               "sign up (if you also enter a location after 'sign up' you " +
               "will be signed up for that location instead of your default)\n\n" +
-              "info (where tonight’s practice is, what time, and who's going)\n\n" +
               "cancel (to remove your name from the signup sheet)\n\n" +
+              "info (where tonight’s practice is, what time\n\n" +
+              "people (who's going tonight)\n\n" +
               "settings (to view and/or change your settings)\n\n" +
               "help me (in case you forget the commands you can use in the future)";
 
@@ -55,41 +56,33 @@ app.post('/sms', function(request, response) {
 
         switch (choice) {
           case "signUp":
-            //TODO sign up function
-            gDocs.signUp(user);
+
+            console.log("message from gDocs ", gDocs.signUp(user));
 
             outMessage = "You are [not actually] signed up for practice. Pickup is at " +
                 "[TIME] from " + user.pickupLocation;
 
             break;
           case "info":
-            // TODO query google sheet for practice info
 
-            outMessage = "Practice tonight is at [LOCATION] from [TIME] " +
-                "until [TIME]. Pickup is at [TIME] from " + user.pickupLocation +
-                ".\n\nPeople who have signed up so far: [LIST OF PEOPLE]"
+            outMessage = gDocs.infoLogistics();
+
+            //outMessage = "Practice tonight is at [LOCATION] from [TIME] " +
+            //    "until [TIME]. Pickup is at [TIME] from " + user.pickupLocation +
+            break;
+          case "people":
+
+            outMessage = gDocs.infoPeople();
+
             break;
           case "cancel":
-            // TODO check if they're actually signed up
-
-
-            // TODO if not actually signed up, tell them they are no longer signed up
-            // if (NOT SIGNED UP) {
-            //     outMessage = "You are no longer signed up for practice.";
-            // }
-
-            // TODO cancel if it's not past the cancel time
-            // if (BEFORE CANCEL TIME) {
-            //
-            // }
 
             // TODO if past the cancel time, tell them they have to text Morgan
             // if (PAST CANCEL TIME){
             //     outMessage = ""
             // }
 
-            // TODO remove this
-            outMessage = "You are no longer signed up for practice.";
+            outMessage = gDocs.cancel(user);
             break;
           case "settings":
             outMessage = "Would you like to change your name or default pickup location?";
@@ -144,7 +137,8 @@ function parseMessage(message, type) {
   else {
       choices =[
         {"choice": "signUp", "words": ['sign', 'register', 'signup']},
-        {"choice": "info", "words": ['info', 'tonight', 'whos', 'going']},
+        {"choice": "info", "words": ['info', 'tonight', 'where', 'when', 'time']},
+        {"choice": "people", "words": ['whos', 'going', 'who', 'people']}
         {"choice": "cancel", "words": ['cancel']},
         {"choice": "settings", "words": ['settings', 'preferences']}
     ];
