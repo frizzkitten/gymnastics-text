@@ -19,15 +19,18 @@ var noRide = true;
 var when = 'there';
 
 // Load client secrets from a local file.
-fs.readFile('client_secret.json', function processClientSecrets(err, content) {
-  if (err) {
-    console.log('Error loading client secret file: ' + err);
-    return;
-  }
-  // Authorize a client with the loaded credentials, then call the
-  // Drive API.
-  authorize(JSON.parse(content), raizelname, true, false, true, gymnasticsCheckStatus);
-});
+function editSheet(user, sign, cancel, driver, action) {
+    fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+      if (err) {
+        console.log('Error loading client secret file: ' + err);
+        return;
+      }
+      // Authorize a client with the loaded credentials, then call the
+      // Drive API.
+      return authorize(JSON.parse(content), user.name, true, false, true, action);
+    });
+}
+
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -115,7 +118,7 @@ function gymnasticsInfoLogistics(auth) {
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
-			return;
+			return "The program failed, sign up using the sheet. Sorry :(";
 		}
 		let rows = response.values;
 		if (rows != undefined) {
@@ -143,7 +146,7 @@ function gymnasticsInfoPeople(auth) {
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
-			return;
+			return "The program failed, sign up using the sheet. Sorry :(";
 		}
 		let rows = response.values;
     let people = [];
@@ -181,7 +184,7 @@ function gymnasticsSignUp(auth, name, driver) {
 	}, function(err, response) {
 		  if (err) {
 			  console.log('The API returned an error: ' + err);
-			  return;
+			  return "The program failed, sign up using the sheet. Sorry :(";
 		  }
       let rows = response.values;
       let a1notation;
@@ -210,7 +213,7 @@ function gymnasticsSignUp(auth, name, driver) {
           }, function(err, response) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
-      		       return;
+      		       return "The program failed, sign up using the sheet. Sorry :(";
       		     }
           });
           sheets.spreadsheets.values.update({
@@ -224,10 +227,10 @@ function gymnasticsSignUp(auth, name, driver) {
           }, function(err, response) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
-      		       return;
+      		       return "The program failed, sign up using the sheet. Sorry :(";
       		     }
           });
-          return;
+          return "You are signed up.";
         }
         else if (canDrive) {
           places = [10,11,12,13,14,15,16];
@@ -249,7 +252,7 @@ function gymnasticsSignUp(auth, name, driver) {
           }, function(err, response) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
-      		       return;
+      		       return "The program failed, sign up using the sheet. Sorry :(";
       		     }
           });
           sheets.spreadsheets.values.update({
@@ -263,10 +266,10 @@ function gymnasticsSignUp(auth, name, driver) {
           }, function(err, response) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
-      		       return;
+      		       return "The program failed, sign up using the sheet. Sorry :(";
       		     }
           });
-          return;
+          return "You are signed up.";
         }
         else if (noRide) {
           places = [18,19,20,21,22,23,24,25,26];
@@ -332,8 +335,9 @@ function gymnasticsSignUp(auth, name, driver) {
       }, function(err, response) {
   	       if (err) {
   	         console.log('The API returned an error: ' + err);
-  		       return;
+  		       return "The program failed, sign up using the sheet. Sorry :(";
   		     }
+        return "You are signed up."
       });
     }
   });
@@ -349,7 +353,7 @@ function gymnasticsCancel(auth, name) {
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
-			return;
+			return "The program failed, cancel using the sheet. Sorry :(";
 		}
     let rows = response.values;
     let a1notation = '';
@@ -388,8 +392,9 @@ function gymnasticsCancel(auth, name) {
       }, function(err, response) {
       	if (err) {
       		console.log('The API returned an error: ' + err);
-      		return;
+      		return "The program failed, cancel using the sheet. Sorry :(";
       	}
+        return "Your name has been removed from the sheet."
       });
     }
   });
@@ -443,19 +448,47 @@ function gymnasticsCheckStatus(auth, name, sign, cancel, driver) {
         return gymnasticsCancel(auth, name);
       }
       else {
-        return true;
+        return "You are already signed up.";
       }
     }
     else {
       if (sign) {
         return gymnasticsSignUp(auth, name, driver);
       }
-      else if (cancel) {
-        return "You are not signed up.";
-      }
       else {
-        return false;
+        return "You are not signed up.";
       }
     }
   });
+}
+
+
+function test() {
+    console.log("DOIN IT");
+}
+
+function signUp(user) {
+    return editSheet(user, true, false, false, gymnasticsCheckStatus);
+}
+function cancel(user) {
+    return editSheet(user, gymnasticsCheckStatus(auth, user.name, false, true, false));
+}
+function checkStatus(user) {
+    return editSheet(user, gymnasticsCheckStatus(auth, user.name, false, false, false));
+}
+function infoPeople() {
+    return editSheet(null, false, false, false, gymnasticsInfoPeople);
+}
+function infoLogistics() {
+    return editSheet(null, false, false, false, gymnasticsInfoLogistics);
+}
+
+
+
+module.exports = {
+    signUp: signUp,
+    cancel: cancel,
+    checkStatus: checkStatus,
+    infoPeople: infoPeople,
+    infoLogistics: infoLogistics
 }

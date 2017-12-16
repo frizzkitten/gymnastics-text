@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 const credentials = require('./credentials');
 const difflib = require('difflib');
 const twilio = require('twilio');
+const gDocs = require("./google_docs_api");
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.post('/sms', function(request, response) {
         switch (choice) {
           case "signUp":
             //TODO sign up function
+            gDocs.signUp(user);
 
             outMessage = "You are [not actually] signed up for practice. Pickup is at " +
                 "[TIME] from " + user.pickupLocation;
