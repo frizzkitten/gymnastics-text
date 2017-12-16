@@ -13,8 +13,10 @@ var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
 
 var raizelname = 'Raizel Lieberman';
 var pickupLocation = 'Hub';
-var canDrive = true;
+var canDrive = false;
 var justRideBack = false;
+var noRide = true;
+var when = 'there';
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -255,7 +257,7 @@ function gymnasticsSignUp(auth, name, driver) {
             range: a1notationB, // TODO: Update placeholder value.
             valueInputOption: 'RAW',
             resource: {
-              values: [[pickupLocation]]
+              values: [[when]]
             },
             auth: auth
           }, function(err, response) {
@@ -396,7 +398,7 @@ function gymnasticsCancel(auth, name) {
 
 function gymnasticsCheckStatus(auth, name, sign, cancel, driver) {
   if (sign == true && cancel == true) {
-    return;
+    return "You cannot sign up and cancel";
   }
   let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
@@ -435,29 +437,23 @@ function gymnasticsCheckStatus(auth, name, sign, cancel, driver) {
     }
     if (status) {
       if (sign) {
-        console.log("you are already signed up");
         return "You are already signed up.";
       }
       else if (cancel) {
-        console.log("cancelling");
         return gymnasticsCancel(auth, name);
       }
       else {
-        console.log("true");
         return true;
       }
     }
     else {
       if (sign) {
-        console.log("signing up");
         return gymnasticsSignUp(auth, name, driver);
       }
       else if (cancel) {
-        console.log("You are not signed up");
         return "You are not signed up.";
       }
       else {
-        console.log(false);
         return false;
       }
     }
