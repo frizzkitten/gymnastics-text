@@ -13,6 +13,8 @@ var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
 
 var raizelname = 'Raizel Lieberman';
 var pickupLocation = 'Hub';
+var canDrive = true;
+var justRideBack = false;
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -180,13 +182,88 @@ function gymnasticsSignUp(auth, name, driver) {
 			  return;
 		  }
       let rows = response.values;
+      let a1notation;
+      let a1notationA;
+      let a1notationB;
       let places;
       if (rows != undefined) {
         //find these values from database?
         if (justRideBack) {
+          places = [0,1,2,3,4,5,6,7,8];
+          for (let i = 0; i < places.length; i++) {
+            if (rows[places[i]][10] == undefined || rows[places[i]][10] == '') {
+              a1notationA = 'R' + (9+places[i]) + ':R' + (9+places[i]);
+              a1notationB = 'S' + (9+places[i]) + ':S' + (9+places[i]);
+              break;
+            }
+          }
+          sheets.spreadsheets.values.update({
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            range: a1notationA, // TODO: Update placeholder value.
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[name]]
+            },
+            auth: auth
+          }, function(err, response) {
+      	       if (err) {
+      	         console.log('The API returned an error: ' + err);
+      		       return;
+      		     }
+          });
+          sheets.spreadsheets.values.update({
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            range: a1notationB, // TODO: Update placeholder value.
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[pickupLocation]]
+            },
+            auth: auth
+          }, function(err, response) {
+      	       if (err) {
+      	         console.log('The API returned an error: ' + err);
+      		       return;
+      		     }
+          });
           return;
         }
         else if (canDrive) {
+          places = [10,11,12,13,14,15,16];
+          for (let i = 0; i < places.length; i++) {
+            if (rows[places[i]][10] == undefined || rows[places[i]][10] == '') {
+              a1notationA = 'R' + (9+places[i]) + ':R' + (9+places[i]);
+              a1notationB = 'S' + (9+places[i]) + ':S' + (9+places[i]);
+              break;
+            }
+          }
+          sheets.spreadsheets.values.update({
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            range: a1notationA, // TODO: Update placeholder value.
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[name]]
+            },
+            auth: auth
+          }, function(err, response) {
+      	       if (err) {
+      	         console.log('The API returned an error: ' + err);
+      		       return;
+      		     }
+          });
+          sheets.spreadsheets.values.update({
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            range: a1notationB, // TODO: Update placeholder value.
+            valueInputOption: 'RAW',
+            resource: {
+              values: [[pickupLocation]]
+            },
+            auth: auth
+          }, function(err, response) {
+      	       if (err) {
+      	         console.log('The API returned an error: ' + err);
+      		       return;
+      		     }
+          });
           return;
         }
         else if (noRide) {
@@ -194,6 +271,7 @@ function gymnasticsSignUp(auth, name, driver) {
           for (let i = 0; i < places.length; i++) {
             if (rows[places[i]][10] == undefined || rows[places[i]][10] == '') {
               a1notation = 'R' + (9+places[i]) + ':R' + (9+places[i]);
+              break;
             }
           }
         }
