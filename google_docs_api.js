@@ -22,7 +22,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Drive API.
-  authorize(JSON.parse(content), gymnasticsCheckStatus);
+  authorize(JSON.parse(content), raizelname, true, false, true, gymnasticsCheckStatus);
 });
 
 /**
@@ -32,7 +32,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+function authorize(credentials, name, sign, cancel, driver, callback) {
   var clientSecret = credentials.installed.client_secret;
   var clientId = credentials.installed.client_id;
   var redirectUrl = credentials.installed.redirect_uris[0];
@@ -45,7 +45,7 @@ function authorize(credentials, callback) {
       getNewToken(oauth2Client, callback);
     } else {
       oauth2Client.credentials = JSON.parse(token);
-      callback(oauth2Client);
+      callback(oauth2Client, name, sign, cancel, driver);
     }
   });
 }
@@ -115,23 +115,15 @@ function gymnasticsInfoLogistics(auth) {
 		}
 		let rows = response.values;
 		if (rows != undefined) {
-      //print info for just today
       let date = new Date();
       let day = date.getDay();
-      console.log('%s, %s', rows[day][1], rows[day+1][1])
-
-      //print info for every day of the week
-      /*
-      let rowNum = 0;
-			while (rowNum < rows.length)
-			{
-				console.log('%s: %s, %s', rows[rowNum][0], rows[rowNum][1], rows[rowNum+1][1]);
-				rowNum += 2;
-			}
-      */
+      if (day == 5 || day == 6) {
+        return "There is no practice today.";
+      }
+      let info = rows[day][1] + ', ' + rows[day+1][1];
+      return info;
 		}
 	});
-	return true;
 }
 
 /**
@@ -150,20 +142,22 @@ function gymnasticsInfoPeople(auth) {
 			return;
 		}
 		let rows = response.values;
+    let people = [];
 		if (rows != undefined) {
 			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
 				let row = rows[rowNum];
 				if (row[0] != '' && row[0] != undefined && row[0] != 'McDonalds' && row[0] != 'New Member (not on list)')
-					console.log('%s', row[0]);
+					people.push(row[0]);
 				if (row[2] != '' && row[2] != undefined && row[2] != 'Hub' && row[2] != 'New Member (not on list)')
-					console.log('%s', row[2]);
+					people.push(row[2]);
 				if (row[6] != '' && row[6] != undefined && row[6] != 'Porter' && row[6] != 'New Member (not on list)')
-					console.log('%s', row[6]);
+					people.push(row[6]);
 				if (row[10] != '' && row[10] != undefined && row[10] != "I'll Be There and can drive if needed"
 						&& row[10] != "I'll Be there - No ride needed" && row[10] != 'New Member (not on list)')
-					console.log('%s', row[10]);
+					people.push(row[10]);
 			}
     }
+    return people;
 	});
 }
 
@@ -173,25 +167,100 @@ function gymnasticsInfoPeople(auth) {
  * TODO: connect with database to get information about people
  * TODO: deal with if people sign up for the same spot at the same time
  */
-function gymnasticsSignUp(auth) {
+function gymnasticsSignUp(auth, name, driver) {
 	let sheets = google.sheets('v4');
-  sheets.spreadsheets.values.update({
-    spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
-    range: 'J21:J21', // TODO: Update placeholder value.
-    valueInputOption: 'RAW',
-    resource: {
-      values: [[raizelname]]
-    },
-    auth: auth
-  }, function(err, response) {
-		if (err) {
-			console.log('The API returned an error: ' + err);
-			return;
-		}
+  let a1notation;
+  sheets.spreadsheets.values.get({
+		auth: auth,
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		range: 'H9:R40'
+	}, function(err, response) {
+		  if (err) {
+			  console.log('The API returned an error: ' + err);
+			  return;
+		  }
+      let rows = response.values;
+      let places;
+      if (rows != undefined) {
+        //find these values from database?
+        if (justRideBack) {
+          return;
+        }
+        else if (canDrive) {
+          return;
+        }
+        else if (noRide) {
+          places = [18,19,20,21,22,23,24,25,26];
+          for (let i = 0; i < places.length; i++) {
+            if (rows[places[i]][10] == undefined || rows[places[i]][10] == '') {
+              a1notation = 'R' + (9+places[i]) + ':R' + (9+places[i]);
+            }
+          }
+        }
+        else {
+          if (pickupLocation == 'McDonalds') {
+            if (driver) {
+              places = [0,6,12,18];
+            }
+            else {
+              places = [1,2,3,4,7,8,9,10,13,14,15,16,19,20,21,22];
+            }
+            for (let i = 0; i < places.length; i++) {
+              if (rows[places[i]][0] == undefined || rows[places[i]][0] == '') {
+                a1notation = 'H' + (9+places[i]) + ':H' + (9+places[i]);
+                break;
+              }
+            }
+          }
+          if (pickupLocation == 'Hub') {
+            if (driver) {
+              places = [0,6,12,18];
+            }
+            else {
+              places = [1,2,3,4,7,8,9,10,13,14,15,16,19,20,21,22];
+            }
+            for (let i = 0; i < places.length; i++) {
+              if (rows[places[i]][2] == undefined || rows[places[i]][2] == '') {
+                a1notation = 'J' + (9+places[i]) + ':J' + (9+places[i]);
+                break;
+              }
+            }
+          }
+          if (pickupLocation == 'Porter') {
+            if (driver) {
+              places = [0,6,12,18];
+            }
+            else {
+              places = [1,2,3,4,7,8,9,10,13,14,15,16,19,20,21,22];
+            }
+            for (let i = 0; i < places.length; i++) {
+              if (rows[places[i]][6] == undefined || rows[places[i]][6] == '') {
+                a1notation = 'N' + (9+places[i]) + ':N' + (9+places[i]);
+                break;
+              }
+            }
+          }
+      }
+      sheets.spreadsheets.values.update({
+        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        range: a1notation, // TODO: Update placeholder value.
+        valueInputOption: 'RAW',
+        resource: {
+          values: [[name]]
+        },
+        auth: auth
+      }, function(err, response) {
+  	       if (err) {
+  	         console.log('The API returned an error: ' + err);
+  		       return;
+  		     }
+      });
+    }
   });
+  //call gymnasticsCheckStatus() to make sure signup worked?
 }
 
-function gymnasticsCancel(auth) {
+function gymnasticsCancel(auth, name) {
 	let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
@@ -208,19 +277,19 @@ function gymnasticsCancel(auth) {
 		if (rows != undefined) {
 			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
         let row = rows[rowNum];
-        if (row[0] == raizelname) {
+        if (row[0] == name) {
           a1notation = 'H' + realRowNum + ':' + 'H' + realRowNum;
           break;
         }
-        else if (row[2] == raizelname) {
+        else if (row[2] == name) {
           a1notation = 'J' + realRowNum + ':' + 'J' + realRowNum;
           break;
         }
-        else if (row[6] == raizelname) {
+        else if (row[6] == name) {
           a1notation = 'N' + realRowNum + ':' + 'N' + realRowNum;
           break;
         }
-        else if (row[10] == raizelname) {
+        else if (row[10] == name) {
           a1notation = 'R' + realRowNum + ':' + 'R' + realRowNum;
           break;
         }
@@ -244,9 +313,13 @@ function gymnasticsCancel(auth) {
       });
     }
   });
+  //call gymnasticsCheckStatus() to make sure cancel worked?
 }
 
-function gymnasticsCheckStatus(auth) {
+function gymnasticsCheckStatus(auth, name, sign, cancel, driver) {
+  if (sign == true && cancel == true) {
+    return;
+  }
   let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
@@ -262,19 +335,19 @@ function gymnasticsCheckStatus(auth) {
 		if (rows != undefined) {
 			for (let rowNum = 0; rowNum < rows.length; rowNum++) {
         let row = rows[rowNum];
-        if (row[0] == raizelname) {
+        if (row[0] == name) {
           status = true;
           break;
         }
-        else if (row[2] == raizelname) {
+        else if (row[2] == name) {
           status = true;
           break;
         }
-        else if (row[6] == raizelname) {
+        else if (row[6] == name) {
           status = true;
           break;
         }
-        else if (row[10] == raizelname) {
+        else if (row[10] == name) {
           status = true;
           break;
         }
@@ -282,6 +355,33 @@ function gymnasticsCheckStatus(auth) {
         }
       }
     }
-    console.log(status);
+    if (status) {
+      if (sign) {
+        console.log("you are already signed up");
+        return "You are already signed up.";
+      }
+      else if (cancel) {
+        console.log("cancelling");
+        return gymnasticsCancel(auth, name);
+      }
+      else {
+        console.log("true");
+        return true;
+      }
+    }
+    else {
+      if (sign) {
+        console.log("signing up");
+        return gymnasticsSignUp(auth, name, driver);
+      }
+      else if (cancel) {
+        console.log("You are not signed up");
+        return "You are not signed up.";
+      }
+      else {
+        console.log(false);
+        return false;
+      }
+    }
   });
 }
