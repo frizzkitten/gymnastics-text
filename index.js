@@ -31,10 +31,12 @@ const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
               "settings (to view and/or change your settings)\n\n" +
               "help me (in case you forget the commands you can use in the future)";
 
+
 app.use(bodyParser.urlencoded());
 app.post('/sms', function(request, response) {
   const inMessage = request.body.Body;
   let outMessage = "";
+  let twiml = new twilio.twiml.MessagingResponse();
   const number = request.body.From;
   const query = { number: number };
   const options = { new: false }
@@ -57,23 +59,35 @@ app.post('/sms', function(request, response) {
         switch (choice) {
           case "signUp":
 
-            console.log("message from gDocs ", gDocs.signUp(user));
-
-            outMessage = "You are [not actually] signed up for practice. Pickup is at " +
-                "[TIME] from " + user.pickupLocation;
-
+            gDocs.signUp(user, function(msg) {
+              console.log(msg);
+              twiml.message(msg);
+              response.writeHead(200, {'Content-Type': 'text/xml'});
+              response.end(twiml.toString());
+            });
+            return;
             break;
           case "info":
 
-            outMessage = gDocs.infoLogistics();
+            gDocs.infoLogistics(function(msg) {
+              twiml.message(msg);
+              response.writeHead(200, {'Content-Type': 'text/xml'});
+              response.end(twiml.toString());
+            });
 
             //outMessage = "Practice tonight is at [LOCATION] from [TIME] " +
             //    "until [TIME]. Pickup is at [TIME] from " + user.pickupLocation +
+            return;
             break;
           case "people":
 
-            outMessage = gDocs.infoPeople();
+            gDocs.infoPeople(function(msg) {
+              twiml.message(msg);
+              response.writeHead(200, {'Content-Type': 'text/xml'});
+              response.end(twiml.toString());
+            });
 
+            return;
             break;
           case "cancel":
 
@@ -82,7 +96,13 @@ app.post('/sms', function(request, response) {
             //     outMessage = ""
             // }
 
-            outMessage = gDocs.cancel(user);
+            gDocs.cancel(user, function(msg) {
+              twiml.message(msg);
+              response.writeHead(200, {'Content-Type': 'text/xml'});
+              response.end(twiml.toString());
+            });
+
+            return;
             break;
           case "settings":
             outMessage = "Would you like to change your name or default pickup location?";
@@ -96,7 +116,6 @@ app.post('/sms', function(request, response) {
         }
       }
 
-      let twiml = new twilio.twiml.MessagingResponse();
       twiml.message(outMessage);
       response.writeHead(200, {'Content-Type': 'text/xml'});
       response.end(twiml.toString());
@@ -139,7 +158,7 @@ function parseMessage(message, type) {
         {"choice": "signUp", "words": ['sign', 'register', 'signup']},
         {"choice": "info", "words": ['info', 'tonight', 'where', 'when', 'time']},
         {"choice": "people", "words": ['whos', 'going', 'who', 'people']},
-        {"choice": "cancel", "words": ['cancel']},
+        {"choice": "cancel", "words": ['cancel', 'drop']},
         {"choice": "settings", "words": ['settings', 'preferences']}
     ];
   }
@@ -148,6 +167,7 @@ function parseMessage(message, type) {
     for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
       //if any word in the message is close to one of the wanted words
       if (difflib.getCloseMatches(words[wordIndex], choices[choiceIndex].words, MAX_MATCHES, WORD_CLOSENESS).length > 0) {
+        console.log("choice is " + choices[choiceIndex].choice)
         return choices[choiceIndex].choice;
       }
     }
@@ -181,7 +201,7 @@ function checkIfNewbie(inText, number, callback) {
       else if (!user.name) {
         let name = inText;
         //TODO DB with this phone # is given name as a name
-        outMessage = "Got it, thanks " + name + ".  In the future, where would you like to be picked up? (Hub, McDonalds, Porter Boathouse)"
+        outMessage = "Got it, thanks " + name + ". Do you want to default to being a driver?"
         const update = { '$set': { name: name, } };
         const options = { new: false };
 
@@ -190,6 +210,24 @@ function checkIfNewbie(inText, number, callback) {
             else { console.log("added name ", user.name, " to user")};
         });
       }
+
+      // set user's driving status
+      else if (user.isDriver == undefined) {
+        // user said they want to default to being a driver
+        let driver = false;
+        outMessage = "Got it, you are not a driver. Where would you like to be picked up? (Hub, McDonalds, Porter Boathouse)"
+        if (inText.toLowerCase().indexOf('y') > -1) {
+          driver = true;
+          outMessage = "You will be marked as a driver when you sign up. Where will you pick people up? (Hub, McDonalds, Porter Boathouse)";
+        }
+        const update = { '$set': { isDriver: driver } };
+        const options = { new: false };
+        Users.findOneAndUpdate(query, update, options, function (err, user) {
+            if (err) { console.log(err); }
+            else { console.log("set driving to ", driver)};
+        });
+      }
+
       // set user's pickup location if none exists
       else if (!user.pickupLocation) {
         // format location to be either McDonalds, Hub, or Porter Boathouse,
@@ -210,7 +248,9 @@ function checkIfNewbie(inText, number, callback) {
 
         outMessage = "Great, your default pickup location will be " + location +
                       ". You are not yet signed up for practice. " + HELP_MESSAGE;
-      } else {
+      }
+
+      else {
         newbie = false;
       }
       callback(newbie, outMessage, user);
