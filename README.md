@@ -32,6 +32,38 @@ module.exports = {
 }
 
 ```
+### Run Script
+```
+kevin@kevinlaptop:~/work/gymnastics-text$ ./run-local.sh -h
+Running GymnasticsText + Ngrok
+_______________________________
+run-local.sh [-h] [-b]
+-h, for help message
+-b, add build argument to docker-compose
+```
+Script starts node app and then brings up ngrok as well, to 
+make setup  as simple as `./run-local.sh`.  Script checks (in order)
+if docker-compose, docker, or neither are installed and 
+runs the appropriate command.  
+For ngrok, it checks first in your path then the local directory.  
+If docker-compose is installed, you can skip the image building stage
+of the installation instructions by passing the `-b` flag.
+
+### Docker usage (installation alternative)
+The Dockerfile handles npm setup work inside the image, 
+and building requires running:
+```
+docker build -t gymnasticstext_node-app .
+```
+so the only thing left to do is start up the container with 
+the current directory as a volume and run npm start.  
+
+To do so interactively, run:
+```
+docker run --rm -it -v "$(pwd)":/app -p 1337:1337 gymnasticstext_node-app /bin/bash
+root@8f537bea9e65:/app# npm start
+```
+Otherwise the run-local script will start it as a daemon.  
 
 ### Installing
 
@@ -60,6 +92,10 @@ Ensure that to the left it says Webhook and to the right it says HTTP POST.
 
 Run npm start and you're done!
 
+## Testing
+Currently tests on the app are run from a Python script in `tests/`.
+see the `README` in the directory for details.
+
 ## Deployment
 
 Haven't deployed yet, still have to run on our own machines.
@@ -74,4 +110,4 @@ See also the list of [contributors](https://github.com/frizzkitten/gymnastics-te
 
 ## Acknowledgments
 
-* Thank you to the forward-thinking leadership of the Wisconsin Gymnastics Club for allowing us to try this out
+* Thank you to the forward-thinking leadership of the Wisconsin Gymnastics Club for allowing us to try this out.
