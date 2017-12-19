@@ -9,7 +9,7 @@ function run_node_app {
     hash docker-compose 2>/dev/null || have_compose=1
     hash docker 2>/dev/null || have_docker=1
 
-    if [ "$have_compose" -eq 1 ]; then
+    if [ "$have_compose" -eq 0 ]; then
         if [ "$build" -eq 0 ]; then
             echo "Running docker-compose with build..."
             docker-compose up --build -d &>/dev/null
