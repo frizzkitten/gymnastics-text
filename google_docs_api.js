@@ -130,6 +130,7 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
       let day = date.getDay();
       if (day == 5 || day == 6) {
         returnMsgFunc("There is no practice today.");
+        return;
       }
       let info = rows[day][1] + ', ' + rows[day+1][1];
       if (day == 0) {
@@ -186,8 +187,7 @@ function gymnasticsInfoPeople(auth, returnMsgFunc) {
 }
 
 /*
- * Sign up on the sheet, right now only can do one slot and one name
- * TODO: connect with database to get information about people
+ * Sign up on the sheet
  * TODO: deal with if people sign up for the same spot at the same time
  */
 function gymnasticsSignUp(auth, returnMsgFunc, user) {
@@ -250,6 +250,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
+                 return;
       		     } else {
                  returnMsgFunc("You are signed up.");
                  return;
@@ -278,10 +279,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
-      		     } else {
-                 returnMsgFunc("You are signed up");
-                 return;
-               }
+      		     }
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
@@ -297,6 +295,8 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
       		     } else {
+                 //not sure if this will work because might happen before other update
+                 //which could send an error
                  returnMsgFunc("You are signed up");
                  return;
                }
@@ -369,7 +369,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
              return;
   		     } else {
-             let returnMessage = "You are signed up"
+             let returnMessage = "You are signed up";
              if (driver) {
                returnMessage += " as a driver";
              }
@@ -499,7 +499,7 @@ function gymnasticsCheckStatus(auth, returnMsgFunc, user, sign, cancel, driver) 
     }
     else {
       if (sign) {
-        returnMsgFunc(gymnasticsSignUp(auth, returnMsgFunc, user));
+        gymnasticsSignUp(auth, returnMsgFunc, user);
         return;
       }
       else {
