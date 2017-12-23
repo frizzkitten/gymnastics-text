@@ -129,9 +129,15 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
       let date = new Date();
       let day = date.getDay();
       if (day == 5 || day == 6) {
-        return "There is no practice today.";
+        returnMsgFunc("There is no practice today.");
       }
       let info = rows[day][1] + ', ' + rows[day+1][1];
+      if (day == 0) {
+        info += '\nPickup is at 5:40';
+      }
+      else {
+        info += '\nPickup is at 8:10';
+      }
       returnMsgFunc(info);
       return;
 		}
@@ -169,7 +175,12 @@ function gymnasticsInfoPeople(auth, returnMsgFunc) {
 					people.push(row[10]);
 			}
     }
-    returnMsgFunc(people);
+    let returnMessage = "";
+    for (let i = 0; i < people.length; i++) {
+      returnMessage += people[i];
+      returnMessage += "\n";
+    }
+    returnMsgFunc(returnMessage);
     return;
 	});
 }
@@ -358,8 +369,10 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
              return;
   		     } else {
-             const asADriver = driver ? "as a driver" : "";
-             const returnMessage = "You are signed up " + asADriver + ".";
+             let returnMessage = "You are signed up"
+             if (driver) {
+               returnMessage += " as a driver";
+             }
              returnMsgFunc(returnMessage);
              return;
            }
