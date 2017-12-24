@@ -129,9 +129,16 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
       let date = new Date();
       let day = date.getDay();
       if (day == 5 || day == 6) {
-        return "There is no practice today.";
+        returnMsgFunc("There is no practice today.");
+        return;
       }
       let info = rows[day][1] + ', ' + rows[day+1][1];
+      if (day == 0) {
+        info += '\nPickup is at 5:40';
+      }
+      else {
+        info += '\nPickup is at 8:10';
+      }
       returnMsgFunc(info);
       return;
 		}
@@ -169,14 +176,18 @@ function gymnasticsInfoPeople(auth, returnMsgFunc) {
 					people.push(row[10]);
 			}
     }
-    returnMsgFunc(people);
+    let returnMessage = "";
+    for (let i = 0; i < people.length; i++) {
+      returnMessage += people[i];
+      returnMessage += "\n";
+    }
+    returnMsgFunc(returnMessage);
     return;
 	});
 }
 
 /*
- * Sign up on the sheet, right now only can do one slot and one name
- * TODO: connect with database to get information about people
+ * Sign up on the sheet
  * TODO: deal with if people sign up for the same spot at the same time
  */
 function gymnasticsSignUp(auth, returnMsgFunc, user) {
@@ -239,6 +250,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	       if (err) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
+                 return;
       		     } else {
                  returnMsgFunc("You are signed up.");
                  return;
@@ -267,10 +279,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
-      		     } else {
-                 returnMsgFunc("You are signed up");
-                 return;
-               }
+      		     }
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
@@ -286,6 +295,8 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
       		     } else {
+                 //not sure if this will work because might happen before other update
+                 //which could send an error
                  returnMsgFunc("You are signed up");
                  return;
                }
@@ -358,8 +369,10 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
              return;
   		     } else {
-             const asADriver = driver ? "as a driver" : "";
-             const returnMessage = "You are signed up " + asADriver + ".";
+             let returnMessage = "You are signed up";
+             if (driver) {
+               returnMessage += " as a driver";
+             }
              returnMsgFunc(returnMessage);
              return;
            }
@@ -486,7 +499,7 @@ function gymnasticsCheckStatus(auth, returnMsgFunc, user, sign, cancel, driver) 
     }
     else {
       if (sign) {
-        returnMsgFunc(gymnasticsSignUp(auth, returnMsgFunc, user));
+        gymnasticsSignUp(auth, returnMsgFunc, user);
         return;
       }
       else {
