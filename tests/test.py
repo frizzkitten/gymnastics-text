@@ -1,16 +1,21 @@
 #! /usr/bin/env python3
 import re
-import requests
+from urllib import request, parse, error
 import argparse
 import configparser
 
 
+# Returns HTTP Response object
 def send_request(url, body, number):
-    data = {'Body':body, 'From': number}
-    r = requests.post(url, data)
-    if r.status_code != 200:
-        print("Returned bad status code %d" % r.status_code)
-    return r
+    data = parse.urlencode({'Body':body, 'From': number}).encode()
+    try:
+        req = request.Request(url, data=data)
+        response = request.urlopen(req)
+    except error.HTTPError as e:
+        print("HTTPError: %s" % e)
+        raise SystemExit
+
+    return response
 
 
 def get_configs(config_fname):
@@ -31,7 +36,7 @@ def get_args():
 
 
 def print_response_as_text(response):
-    msg = re.sub('<[^>]*>', '', response.text)
+    msg = re.sub('<[^>]*>', '', response.read().decode('utf-8'))
     print('------------')
     print(msg)
     print('------------')
@@ -48,7 +53,6 @@ def main():
     number = config['local']['number']
     r = send_request(url, body, number)
     print_response_as_text(r)
-
 
 if __name__ == "__main__":
     main()
