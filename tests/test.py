@@ -7,7 +7,7 @@ import configparser
 
 # Returns HTTP Response object
 def send_request(url, body, number):
-    data = parse.urlencode({'Body':body, 'From': number}).encode()
+    data = parse.urlencode({"Body":body, "From": number}).encode()
     try:
         req = request.Request(url, data=data)
         response = request.urlopen(req)
@@ -23,34 +23,37 @@ def get_configs(config_fname):
     try:
         config.read(config_fname)
     except configparser.MissingSectionHeaderError:
-        print('Couldn\'t parse given config filename')
+        print("Couldn\"t parse given config filename")
         raise SystemExit
     return config
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Testing the GymnasticsText API")
-    parser.add_argument('--user-tests', help='Run tests on user signup, etc. Make sure they aren\'t already in DB.')
-    parser.add_argument('url', help='ngrok url to test, script handles correct path')
+    parser = argparse.ArgumentParser(description="Testing the GymnasticsText API.")
+    parser.add_argument("-b", help="Change body of message sent to the server.")
+    parser.add_argument("--user-tests", help="Run tests on user signup, etc. Make sure they aren\"t already in DB.")
+    parser.add_argument("url", help="ngrok url to test, script handles correct path.")
     return parser.parse_args()
 
 
 def print_response_as_text(response):
-    msg = re.sub('<[^>]*>', '', response.read().decode('utf-8'))
-    print('------------')
+    msg = re.sub("<[^>]*>", "", response.read().decode("utf-8"))
+    print("------------")
     print(msg)
-    print('------------')
+    print("------------")
 
 
 def main():
-    config_fname = 'config.ini'
+    config_fname = "config.ini"
     config = get_configs(config_fname)
     args = get_args()
-    url = args.url + config['local']['path']
+    url = args.url + config["local"]["path"]
+    body = config["local"]["body"]
+    number = config["local"]["number"]
+    if args.b:
+        body = args.b
 
     print("Running tests on GymnasticsText..")
-    body = config['local']['body']
-    number = config['local']['number']
     r = send_request(url, body, number)
     print_response_as_text(r)
 
