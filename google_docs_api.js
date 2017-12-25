@@ -11,13 +11,11 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-nasty-text.json';
 
-//var raizelname = 'Raizel Lieberman';
-//var pickupLocation = 'Hub';
+//placeholder values for now, used for special sign ups
 var canDrive = false;
 var justRideBack = false;
 var noRide = false;
 var when = 'there';
-//var driver = false;
 
 // Load client secrets from a local file.
 function editSheet(user, sign, cancel, action, returnMsgFunc) {
@@ -117,7 +115,7 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'C28:D37'
 	}, function(err, response) {
 		if (err) {
@@ -146,14 +144,14 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 }
 
 /**
- * Print the names and pickup locations of students in hackathon spreadsheet:
- * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ/edit#gid=0
+ * Print the names and pickup locations of students in the spreadsheet:
+ * https://docs.google.com/spreadsheets/d/1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920
  */
 function gymnasticsInfoPeople(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -195,11 +193,23 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   const pickupLocation = user.pickupLocation;
   const driver = user.isDriver;
 
+  let date = new Date();
+  let day = date.getDay();
+  if (day == 5 || day == 6) {
+    returnMsgFunc("There is no practice today");
+    return;
+  }
+  let time = date.getTime();
+  if ((day == 0 && time > 15) || ((day >= 1 && day <= 4) && time > 17)) {
+    returnMsgFunc("It's past the sign up time, text Morgan to sign up");
+    return;
+  }
+
 	let sheets = google.sheets('v4');
   let a1notation;
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		  if (err) {
@@ -224,7 +234,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -239,7 +249,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		     }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -267,7 +277,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -282,7 +292,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		     }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -356,7 +366,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
           }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -382,10 +392,22 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
 }
 
 function gymnasticsCancel(auth, returnMsgFunc, name) {
+  let date = new Date();
+  let day = date.getDay();
+  let time = date.getTime();
+  if (day == 5 || day == 6) {
+    returnMsgFunc("There is no practice today");
+    return;
+  }
+  if ((day == 0 && time >= 16) || ((day >= 1 && day <= 4) && time >= 18)) {
+    returnMsgFunc("It is past the cancel time, text Morgan to cancel");
+    return;
+  }
+
 	let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -420,7 +442,7 @@ function gymnasticsCancel(auth, returnMsgFunc, name) {
         }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -450,7 +472,7 @@ function gymnasticsCheckStatus(auth, returnMsgFunc, user, sign, cancel, driver) 
   let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
