@@ -262,7 +262,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
       		     } else {
-                 returnMsgFunc("You are signed up.");
+                 returnMsgFunc("You are signed up");
                  return;
                }
           });
