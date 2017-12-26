@@ -200,7 +200,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
     return;
   }
   let time = date.getHours();
-  if ((day == 0 && time > 15) || ((day >= 1 && day <= 4) && time > 17)) {
+  if ((day == 0 && time >= 15) || ((day >= 1 && day <= 4) && time >= 17)) {
     console.log(day);
     console.log(time);
     returnMsgFunc("It's past the sign up time, text Morgan to sign up");
