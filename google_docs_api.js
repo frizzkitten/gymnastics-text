@@ -199,8 +199,10 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
     returnMsgFunc("There is no practice today");
     return;
   }
-  let time = date.getTime();
+  let time = date.getHours();
   if ((day == 0 && time > 15) || ((day >= 1 && day <= 4) && time > 17)) {
+    console.log(day);
+    console.log(time);
     returnMsgFunc("It's past the sign up time, text Morgan to sign up");
     return;
   }
@@ -246,7 +248,10 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
-      		     }
+      		     } else {
+                 returnMsgFunc("You are signed up");
+                 return;
+               }
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
@@ -261,10 +266,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
-      		     } else {
-                 returnMsgFunc("You are signed up");
-                 return;
-               }
+      		     }
           });
         }
         else if (canDrive) {
@@ -290,6 +292,9 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
       		     }
+               else {
+                 returnMsgFunc("You are signed up");
+               }
           });
           sheets.spreadsheets.values.update({
             spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
@@ -304,12 +309,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
       	         console.log('The API returned an error: ' + err);
       		       returnMsgFunc("The program failed, sign up using the sheet. Sorry :(");
                  return;
-      		     } else {
-                 //not sure if this will work because might happen before other update
-                 //which could send an error
-                 returnMsgFunc("You are signed up");
-                 return;
-               }
+      		     }
           });
         }
         else if (noRide) {
@@ -394,7 +394,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
 function gymnasticsCancel(auth, returnMsgFunc, name) {
   let date = new Date();
   let day = date.getDay();
-  let time = date.getTime();
+  let time = date.getHours();
   if (day == 5 || day == 6) {
     returnMsgFunc("There is no practice today");
     return;

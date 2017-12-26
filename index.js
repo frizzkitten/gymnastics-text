@@ -25,8 +25,8 @@ const twilioClient = require('twilio')(accountSid, authToken);
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
               "sign up (if you also enter a location after 'sign up' you " +
               "will be signed up for that location instead of your default)\n\n" +
-              "cancel (to remove your name from the signup sheet)\n\n" +
-              "info (where tonight’s practice is, what time\n\n" +
+              "drop (to remove your name from the signup sheet)\n\n" +
+              "time (where tonight’s practice is, what time)\n\n" +
               "people (who's going tonight)\n\n" +
               "settings (to view and/or change your settings)\n\n" +
               "help me (in case you forget the commands you can use in the future)";
