@@ -21,17 +21,16 @@ Two options here.
 ### Prerequisites
 
 Clone this repository.
-Create a file called credentials.js which looks like this:
+There are several environment variables necessary for sensitive information:
 
 ```
-module.exports = {
-    dbUsername: "YOUR MLAB USERNAME",
-    dbPassword: "YOUR MLAB PASSWORD",
-    twilioSID: "YOUR TWILIO SID",
-    twilioAuthToken: "YOUR TWILIO AUTH TOKEN"
-}
+    DBUSERNAME=YOUR_MLAB_USERNAME
+    DBPASSWORD=YOUR_MLAB_PASSWORD
+    TWILIOSID=YOUR TWILIO_SID
+    TWILIOAUTHTOKEN=YOUR_TWILIO_AUTH_TOKEN
 
 ```
+
 ### Run Script
 ```
 kevin@kevinlaptop:~/work/gymnastics-text$ ./run-local.sh -h

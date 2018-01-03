@@ -3,14 +3,13 @@ const express = require('express');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 let bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-const credentials = require('./credentials');
 const difflib = require('difflib');
 const twilio = require('twilio');
 const gDocs = require("./google_docs_api");
 
 const app = express();
 
-const dbConnectLink = 'mongodb://' + credentials.dbUsername + ':' + credentials.dbPassword + '@ds133796.mlab.com:33796/gymnasticsdb'
+const dbConnectLink = 'mongodb://' + process.env.DBUSERNAME + ':' + process.env.DBPASSWORD + '@ds133796.mlab.com:33796/gymnasticsdb'
 mongoose.connect(dbConnectLink);
 
 var db = mongoose.connection;
@@ -18,8 +17,8 @@ db.on('error', console.error.bind(console, '# MongoDB - connection error: '));
 
 var Users = require('./models/users.js');
 
-const accountSid = credentials.twilioSID;
-const authToken = credentials.twilioAuthToken;
+const accountSid = process.env.TWILIOSID;
+const authToken = process.env.TWILIOAUTHTOKEN;
 const twilioClient = require('twilio')(accountSid, authToken);
 
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
