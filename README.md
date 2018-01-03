@@ -30,6 +30,7 @@ There are several environment variables necessary for sensitive information:
     TWILIOAUTHTOKEN=YOUR_TWILIO_AUTH_TOKEN
 
 ```
+You will also need the `client-secret.json` file provided for use with Google Sheets.  
 
 ### Run Script
 ```
