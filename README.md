@@ -96,8 +96,12 @@ Currently tests on the app are run from a Python script in `tests/`.
 see the `README` in the directory for details.
 
 ## Deployment
-
-Haven't deployed yet, still have to run on our own machines.
+The first deployment of the app uses Nanobox with Digital Ocean as the VPS provider https://nanobox.io/.  
+To use Nanobox, you must first follow their installation instructions for their CLI tool and create an account.  
+You must also have an account with one of the many VPS providers like Digital Ocean, AWS, Azure, etc.  
+Then for developing & setting up the app, follow the Express app documentation on their website, and env variables will have to be added using the nanobox tool.  
+The only thing I found to be not necessary (which is probably from our lack of experience) is the step about `bin/www`, didn't end up knowing how to use it and wasn't needed.  
+For deployment, follow the instructions given in your Nanobox dashboard.
 
 ## Authors
 
