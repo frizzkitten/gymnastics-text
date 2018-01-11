@@ -115,7 +115,7 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
 		range: 'C28:D37'
 	}, function(err, response) {
 		if (err) {
@@ -145,13 +145,13 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 
 /**
  * Print the names and pickup locations of students in the spreadsheet:
- * https://docs.google.com/spreadsheets/d/1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920
+ * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ
  */
 function gymnasticsInfoPeople(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -211,7 +211,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   let a1notation;
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
 		range: 'H9:R40'
 	}, function(err, response) {
 		  if (err) {
@@ -236,7 +236,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -254,7 +254,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
                }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -279,7 +279,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -297,7 +297,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
                }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -366,7 +366,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
           }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -407,7 +407,7 @@ function gymnasticsCancel(auth, returnMsgFunc, name) {
 	let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -442,7 +442,7 @@ function gymnasticsCancel(auth, returnMsgFunc, name) {
         }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -472,7 +472,7 @@ function gymnasticsCheckStatus(auth, returnMsgFunc, user, sign, cancel, driver) 
   let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
+		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
