@@ -115,7 +115,7 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'C28:D37'
 	}, function(err, response) {
 		if (err) {
@@ -145,13 +145,13 @@ function gymnasticsInfoLogistics(auth, returnMsgFunc) {
 
 /**
  * Print the names and pickup locations of students in the spreadsheet:
- * https://docs.google.com/spreadsheets/d/1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ
+ * https://docs.google.com/spreadsheets/d/1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920
  */
 function gymnasticsInfoPeople(auth, returnMsgFunc) {
 	let sheets = google.sheets('v4');
 	sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -199,6 +199,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
     returnMsgFunc("There is no practice today");
     return;
   }
+
   let time = date.getHours();
   if ((day == 0 && time >= 15) || ((day >= 1 && day <= 4) && time >= 17)) {
     console.log(day);
@@ -211,7 +212,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
   let a1notation;
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		  if (err) {
@@ -236,7 +237,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -254,7 +255,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
                }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -279,7 +280,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
             }
           }
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationA,
             valueInputOption: 'RAW',
             resource: {
@@ -297,7 +298,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
                }
           });
           sheets.spreadsheets.values.update({
-            spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+            spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
             range: a1notationB,
             valueInputOption: 'RAW',
             resource: {
@@ -366,7 +367,7 @@ function gymnasticsSignUp(auth, returnMsgFunc, user) {
           }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -407,7 +408,7 @@ function gymnasticsCancel(auth, returnMsgFunc, name) {
 	let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
@@ -442,7 +443,7 @@ function gymnasticsCancel(auth, returnMsgFunc, name) {
         }
       }
       sheets.spreadsheets.values.update({
-        spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+        spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
         range: a1notation,
         valueInputOption: 'RAW',
         resource: {
@@ -472,7 +473,7 @@ function gymnasticsCheckStatus(auth, returnMsgFunc, user, sign, cancel, driver) 
   let sheets = google.sheets('v4');
   sheets.spreadsheets.values.get({
 		auth: auth,
-		spreadsheetId: '1-Lxy_dX73c3-xUHJ-43lBB8ciMdvAOviSS6xWFCypsQ',
+		spreadsheetId: '1niCVuzqPHgCGvwGQxsMrPzF_uEfAtNdcbe92oswm920',
 		range: 'H9:R40'
 	}, function(err, response) {
 		if (err) {
