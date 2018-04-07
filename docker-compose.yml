@@ -6,4 +6,5 @@ services:
       - .:/app
     ports:
       - "1337:1337"
-
+    env_file:
+      - ./env-file
