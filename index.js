@@ -3,14 +3,14 @@ const express = require('express');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 let bodyParser = require('body-parser');
 var mongoose = require('mongoose');
-const credentials = require('./credentials');
 const difflib = require('difflib');
 const twilio = require('twilio');
 const gDocs = require("./google_docs_api");
+const helper = require('./helper');
 
 const app = express();
 
-const dbConnectLink = 'mongodb://' + credentials.dbUsername + ':' + credentials.dbPassword + '@ds133796.mlab.com:33796/gymnasticsdb'
+const dbConnectLink = 'mongodb://' + process.env.DBUSERNAME + ':' + process.env.DBPASSWORD + '@ds133796.mlab.com:33796/gymnasticsdb'
 mongoose.connect(dbConnectLink);
 
 var db = mongoose.connection;
@@ -18,8 +18,8 @@ db.on('error', console.error.bind(console, '# MongoDB - connection error: '));
 
 var Users = require('./models/users.js');
 
-const accountSid = credentials.twilioSID;
-const authToken = credentials.twilioAuthToken;
+const accountSid = process.env.TWILIOSID;
+const authToken = process.env.TWILIOAUTHTOKEN;
 const twilioClient = require('twilio')(accountSid, authToken);
 
 const HELP_MESSAGE = "Here are some things you can send me:\n\n" +
@@ -54,7 +54,7 @@ app.post('/sms', function(request, response) {
       // this means the person has an account and is not changing settings
       else {
         // parse to figure out which command the person wants to perform
-        let choice = parseMessage(inMessage, false);
+        let choice = helper.parseMessage(inMessage, false);
 
         switch (choice) {
           case "signUp":
@@ -133,56 +133,6 @@ function createUser(number, name, location) {
     });
 };
 
-
-function parseMessage(message, type) {
-  let WORD_CLOSENESS = .6;
-  let MAX_MATCHES = 1;
-
-  choices = [];
-
-  let words = message.split(" ");
-  if (type == "getLocation") {
-      choices = [
-          {"choice": "Hub", "words": ["Hub"]},
-          {"choice": "McDonalds", "words": ["McDonalds", "mickey"]},
-          {"choice": "Porter Boathouse", "words": ["Porter", "Boathouse", "lakeshore", "boat", "house"]}
-      ];
-  } else if (type == "settingToChange") {
-      choices = [
-          {"choice": "name", "words": ["name"]},
-          {"choice": "default pickup location", "words": ["default", "pickup", "location", "spot"]}
-      ]
-  }
-  else {
-      choices =[
-        {"choice": "signUp", "words": ['sign', 'register', 'signup']},
-        {"choice": "info", "words": ['info', 'tonight', 'where', 'when', 'time']},
-        {"choice": "people", "words": ['whos', 'going', 'who', 'people']},
-        {"choice": "cancel", "words": ['cancel', 'drop']},
-        {"choice": "settings", "words": ['settings', 'preferences']}
-    ];
-  }
-
-  for (let choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
-    for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
-      //if any word in the message is close to one of the wanted words
-      if (difflib.getCloseMatches(words[wordIndex], choices[choiceIndex].words, MAX_MATCHES, WORD_CLOSENESS).length > 0) {
-        console.log("choice is " + choices[choiceIndex].choice)
-        return choices[choiceIndex].choice;
-      }
-    }
-  }
-
-  if (type == "getLocation") {
-      return undefined;
-  } else if (type == "settingToChange") {
-      return undefined;
-  } else {
-      return "help";
-  }
-}
-
-
 function checkIfNewbie(inText, number, callback) {
   let outMessage = "";
   let newbie = true;
@@ -232,7 +182,7 @@ function checkIfNewbie(inText, number, callback) {
       else if (!user.pickupLocation) {
         // format location to be either McDonalds, Hub, or Porter Boathouse,
         // or return that you want one of those as a response if not close
-        let location = parseMessage(inText, "getLocation");
+        let location = helper.parseMessage(inText, "getLocation");
         if (!location) {
             outMessage = "Sorry, I couldn't understand that. Would you like to be picked up at the Hub, McDonalds, or Porter Boathouse."
             callback(newbie, outMessage, user);
@@ -266,7 +216,7 @@ function changeSettings(user, inMessage, query, options) {
             updated.name = inMessage;
             outMessage = "Your name has been changed name to " + inMessage;
         } else if (user.settingToChange == "default pickup location") {
-            let location = parseMessage(inMessage, "getLocation");
+            let location = helper.parseMessage(inMessage, "getLocation");
             if (!location) {
                 outMessage = "Sorry, that isn't a location I recognize. Not changing settings.";
             } else {
@@ -283,7 +233,7 @@ function changeSettings(user, inMessage, query, options) {
 
     // user is entering which setting they want to change
     else {
-        let settingToChange = parseMessage(inMessage, "settingToChange");
+        let settingToChange = helper.parseMessage(inMessage, "settingToChange");
         // user didn't enter 'name' or 'default pickup location', exit settings mode
         if (!settingToChange) {
             outMessage = "I didn't understand that, sorry! Not changing any settings.";

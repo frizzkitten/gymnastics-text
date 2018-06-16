@@ -2,9 +2,10 @@
   "name": "gymnastics-text",
   "version": "1.0.0",
   "description": "easily sign up for gymnastics!",
+  "repository": "https://github.com/frizzkitten/gymnastics-text",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node index.js"
   },
   "author": "",
@@ -18,5 +19,12 @@
     "ngrok": "^2.2.24",
     "npm": "^5.8.0",
     "twilio": "^3.10.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.1.0",
+    "sinon": "^4.5.0",
+    "supertest": "^3.0.0"
   }
 }

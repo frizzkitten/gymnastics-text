@@ -2,3 +2,6 @@ credentials.js
 client_secret.json
 tests/venv
 tests/config.ini
+.credentials/
+node_modules/
+.vscode/
